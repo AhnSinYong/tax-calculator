@@ -1,11 +1,92 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+<meta charset="UTF-8">
+<title>종합소득세 + 건보료 계산기</title>
+<style>
+  body { font-family: sans-serif; margin: 20px; }
+  input { margin: 5px; }
+</style>
 </head>
 <body>
+<h2>종합소득세 + 건보료 계산기</h2>
+
+<label>근로소득: <input type="number" id="workIncome" value="30000000"></label><br>
+<label>배당소득: <input type="number" id="dividendIncome" value="25000000"></label><br>
+<label>재산(원): <input type="number" id="propertyValue" value="200000000"></label><br>
+<label>지역가입자 여부: 
+  <select id="isLocalMember">
+    <option value="false">아니오</option>
+    <option value="true">예</option>
+  </select>
+</label><br>
+<button onclick="calculate()">계산</button>
+
+<pre id="result"></pre>
+
+<script>
+function calcTaxAndNHIP({ workIncome = 0, dividendIncome = 0, propertyValue = 0, isLocalMember = false }) {
+  let workDeduction = 0;
+  if (workIncome <= 5000000) workDeduction = workIncome * 0.7;
+  else if (workIncome <= 15000000) workDeduction = 3500000 + (workIncome - 5000000) * 0.4;
+  else if (workIncome <= 45000000) workDeduction = 7500000 + (workIncome - 15000000) * 0.15;
+  else if (workIncome <= 100000000) workDeduction = 12000000 + (workIncome - 45000000) * 0.05;
+  else workDeduction = 14750000 + (workIncome - 100000000) * 0.02;
+
+  const taxableIncome = Math.max(0, (workIncome - workDeduction) + dividendIncome);
+
+  const taxTable = [
+    { limit: 12000000, rate: 0.06, minus: 0 },
+    { limit: 46000000, rate: 0.15, minus: 1080000 },
+    { limit: 88000000, rate: 0.24, minus: 5220000 },
+    { limit: 150000000, rate: 0.35, minus: 14900000 },
+    { limit: 300000000, rate: 0.38, minus: 19400000 },
+    { limit: 500000000, rate: 0.40, minus: 25400000 },
+    { limit: Infinity, rate: 0.42, minus: 35400000 },
+  ];
+  const bracket = taxTable.find(b => taxableIncome <= b.limit);
+  const incomeTax = taxableIncome * bracket.rate - bracket.minus;
+
+  const localTax = incomeTax * 0.1;
+
+  const nhipRate = 0.0709;
+  const ltcRate = 0.09182;
+
+  let annualNHIP = 0;
+  if (!isLocalMember) {
+    if (dividendIncome > 20000000) {
+      annualNHIP = (dividendIncome - 20000000) * nhipRate;
+    }
+  } else {
+    const propertyScore = propertyValue / 10000000 * 50;
+    const propertyMonthly = propertyScore * 205;
+    const propertyAnnual = propertyMonthly * 12;
+    annualNHIP = taxableIncome * nhipRate + propertyAnnual;
+  }
+
+  const annualLTC = annualNHIP * ltcRate;
+  const totalAnnualNHIP = annualNHIP + annualLTC;
+
+  return {
+    taxableIncome: Math.round(taxableIncome),
+    incomeTax: Math.round(incomeTax),
+    localTax: Math.round(localTax),
+    totalTax: Math.round(incomeTax + localTax),
+    annualNHIP: Math.round(totalAnnualNHIP),
+    monthlyNHIP: Math.round(totalAnnualNHIP / 12)
+  };
+}
+
+function calculate() {
+  const workIncome = parseInt(document.getElementById('workIncome').value, 10);
+  const dividendIncome = parseInt(document.getElementById('dividendIncome').value, 10);
+  const propertyValue = parseInt(document.getElementById('propertyValue').value, 10);
+  const isLocalMember = document.getElementById('isLocalMember').value === 'true';
+
+  const result = calcTaxAndNHIP({ workIncome, dividendIncome, propertyValue, isLocalMember });
+  document.getElementById('result').textContent = JSON.stringify(result, null, 2);
+}
+</script>
 
 </body>
 </html>
