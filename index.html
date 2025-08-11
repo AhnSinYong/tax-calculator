@@ -1,108 +1,174 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>종합소득세 + 건보료 계산기</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
-  body { font-family: Arial, sans-serif; margin: 0; background: #f4f6f8; }
-  .container { max-width: 480px; margin: auto; padding: 20px; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-radius: 10px; margin-top: 30px; }
-  h2 { text-align: center; margin-bottom: 20px; }
-  label { display: block; margin-top: 10px; font-weight: bold; }
-  input, select { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-  button { width: 100%; margin-top: 20px; padding: 12px; background: #4CAF50; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; }
-  button:hover { background: #45a049; }
-  pre { background: #f8f8f8; padding: 10px; border-radius: 5px; margin-top: 20px; overflow-x: auto; }
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f4f6f8;
+  }
+  .container {
+    max-width: 480px;
+    margin: 30px auto;
+    padding: 20px;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+  }
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+  }
+  input,
+  select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
+  button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 12px;
+    background: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #45a049;
+  }
+  table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+  }
+  th,
+  td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: right;
+  }
+  th {
+    background: #f0f0f0;
+    text-align: left;
+  }
 </style>
 </head>
 <body>
+  <div class="container">
+    <h2>종합소득세 + 건보료 계산기</h2>
 
-<div class="container">
-  <h2>종합소득세 + 건보료 계산기</h2>
+    <label for="workIncome">근로소득 (원)</label>
+    <input type="number" id="workIncome" value="30000000" />
 
-  <label>근로소득 (원)</label>
-  <input type="number" id="workIncome" value="30000000">
+    <label for="dividendIncome">배당소득 (원)</label>
+    <input type="number" id="dividendIncome" value="25000000" />
 
-  <label>배당소득 (원)</label>
-  <input type="number" id="dividendIncome" value="25000000">
+    <label for="propertyValue">재산 (원)</label>
+    <input type="number" id="propertyValue" value="200000000" />
 
-  <label>재산 (원)</label>
-  <input type="number" id="propertyValue" value="200000000">
+    <label for="isLocalMember">지역가입자 여부</label>
+    <select id="isLocalMember">
+      <option value="false">아니오</option>
+      <option value="true">예</option>
+    </select>
 
-  <label>지역가입자 여부</label>
-  <select id="isLocalMember">
-    <option value="false">아니오</option>
-    <option value="true">예</option>
-  </select>
+    <button onclick="calculate()">계산하기</button>
 
-  <button onclick="calculate()">계산하기</button>
+    <table id="resultTable" style="display:none">
+      <tbody>
+        <tr><th>과세표준</th><td id="taxableIncome"></td></tr>
+        <tr><th>종합소득세</th><td id="incomeTax"></td></tr>
+        <tr><th>지방소득세</th><td id="localTax"></td></tr>
+        <tr><th>총 세금</th><td id="totalTax"></td></tr>
+        <tr><th>연간 건강보험료</th><td id="annualNHIP"></td></tr>
+        <tr><th>월 건강보험료</th><td id="monthlyNHIP"></td></tr>
+      </tbody>
+    </table>
+  </div>
 
-  <pre id="result"></pre>
-</div>
+  <script>
+    function calcTaxAndNHIP({ workIncome = 0, dividendIncome = 0, propertyValue = 0, isLocalMember = false }) {
+      let workDeduction = 0;
+      if (workIncome <= 5000000) workDeduction = workIncome * 0.7;
+      else if (workIncome <= 15000000) workDeduction = 3500000 + (workIncome - 5000000) * 0.4;
+      else if (workIncome <= 45000000) workDeduction = 7500000 + (workIncome - 15000000) * 0.15;
+      else if (workIncome <= 100000000) workDeduction = 12000000 + (workIncome - 45000000) * 0.05;
+      else workDeduction = 14750000 + (workIncome - 100000000) * 0.02;
 
-<script>
-function calcTaxAndNHIP({ workIncome = 0, dividendIncome = 0, propertyValue = 0, isLocalMember = false }) {
-  let workDeduction = 0;
-  if (workIncome <= 5000000) workDeduction = workIncome * 0.7;
-  else if (workIncome <= 15000000) workDeduction = 3500000 + (workIncome - 5000000) * 0.4;
-  else if (workIncome <= 45000000) workDeduction = 7500000 + (workIncome - 15000000) * 0.15;
-  else if (workIncome <= 100000000) workDeduction = 12000000 + (workIncome - 45000000) * 0.05;
-  else workDeduction = 14750000 + (workIncome - 100000000) * 0.02;
+      const taxableIncome = Math.max(0, (workIncome - workDeduction) + dividendIncome);
 
-  const taxableIncome = Math.max(0, (workIncome - workDeduction) + dividendIncome);
+      const taxTable = [
+        { limit: 12000000, rate: 0.06, minus: 0 },
+        { limit: 46000000, rate: 0.15, minus: 1080000 },
+        { limit: 88000000, rate: 0.24, minus: 5220000 },
+        { limit: 150000000, rate: 0.35, minus: 14900000 },
+        { limit: 300000000, rate: 0.38, minus: 19400000 },
+        { limit: 500000000, rate: 0.40, minus: 25400000 },
+        { limit: Infinity, rate: 0.42, minus: 35400000 },
+      ];
+      const bracket = taxTable.find(b => taxableIncome <= b.limit);
+      const incomeTax = taxableIncome * bracket.rate - bracket.minus;
 
-  const taxTable = [
-    { limit: 12000000, rate: 0.06, minus: 0 },
-    { limit: 46000000, rate: 0.15, minus: 1080000 },
-    { limit: 88000000, rate: 0.24, minus: 5220000 },
-    { limit: 150000000, rate: 0.35, minus: 14900000 },
-    { limit: 300000000, rate: 0.38, minus: 19400000 },
-    { limit: 500000000, rate: 0.40, minus: 25400000 },
-    { limit: Infinity, rate: 0.42, minus: 35400000 },
-  ];
-  const bracket = taxTable.find(b => taxableIncome <= b.limit);
-  const incomeTax = taxableIncome * bracket.rate - bracket.minus;
+      const localTax = incomeTax * 0.1;
 
-  const localTax = incomeTax * 0.1;
+      const nhipRate = 0.0709;
+      const ltcRate = 0.09182;
 
-  const nhipRate = 0.0709;
-  const ltcRate = 0.09182;
+      let annualNHIP = 0;
+      if (!isLocalMember) {
+        if (dividendIncome > 20000000) {
+          annualNHIP = (dividendIncome - 20000000) * nhipRate;
+        }
+      } else {
+        const propertyScore = propertyValue / 10000000 * 50;
+        const propertyMonthly = propertyScore * 205;
+        const propertyAnnual = propertyMonthly * 12;
+        annualNHIP = taxableIncome * nhipRate + propertyAnnual;
+      }
 
-  let annualNHIP = 0;
-  if (!isLocalMember) {
-    if (dividendIncome > 20000000) {
-      annualNHIP = (dividendIncome - 20000000) * nhipRate;
+      const annualLTC = annualNHIP * ltcRate;
+      const totalAnnualNHIP = annualNHIP + annualLTC;
+
+      return {
+        taxableIncome: taxableIncome.toLocaleString() + ' 원',
+        incomeTax: Math.round(incomeTax).toLocaleString() + ' 원',
+        localTax: Math.round(localTax).toLocaleString() + ' 원',
+        totalTax: Math.round(incomeTax + localTax).toLocaleString() + ' 원',
+        annualNHIP: Math.round(totalAnnualNHIP).toLocaleString() + ' 원',
+        monthlyNHIP: Math.round(totalAnnualNHIP / 12).toLocaleString() + ' 원',
+      };
     }
-  } else {
-    const propertyScore = propertyValue / 10000000 * 50;
-    const propertyMonthly = propertyScore * 205;
-    const propertyAnnual = propertyMonthly * 12;
-    annualNHIP = taxableIncome * nhipRate + propertyAnnual;
-  }
 
-  const annualLTC = annualNHIP * ltcRate;
-  const totalAnnualNHIP = annualNHIP + annualLTC;
+    function calculate() {
+      const workIncome = parseInt(document.getElementById('workIncome').value, 10);
+      const dividendIncome = parseInt(document.getElementById('dividendIncome').value, 10);
+      const propertyValue = parseInt(document.getElementById('propertyValue').value, 10);
+      const isLocalMember = document.getElementById('isLocalMember').value === 'true';
 
-  return {
-    과세표준: taxableIncome.toLocaleString() + '원',
-    종합소득세: Math.round(incomeTax).toLocaleString() + '원',
-    지방소득세: Math.round(localTax).toLocaleString() + '원',
-    총세금: Math.round(incomeTax + localTax).toLocaleString() + '원',
-    연간건보료: Math.round(totalAnnualNHIP).toLocaleString() + '원',
-    월건보료: Math.round(totalAnnualNHIP / 12).toLocaleString() + '원'
-  };
-}
+      const result = calcTaxAndNHIP({ workIncome, dividendIncome, propertyValue, isLocalMember });
 
-function calculate() {
-  const workIncome = parseInt(document.getElementById('workIncome').value, 10);
-  const dividendIncome = parseInt(document.getElementById('dividendIncome').value, 10);
-  const propertyValue = parseInt(document.getElementById('propertyValue').value, 10);
-  const isLocalMember = document.getElementById('isLocalMember').value === 'true';
-
-  const result = calcTaxAndNHIP({ workIncome, dividendIncome, propertyValue, isLocalMember });
-  document.getElementById('result').textContent = JSON.stringify(result, null, 2);
-}
-</script>
-
+      document.getElementById('resultTable').style.display = 'table';
+      document.getElementById('taxableIncome').textContent = result.taxableIncome;
+      document.getElementById('incomeTax').textContent = result.incomeTax;
+      document.getElementById('localTax').textContent = result.localTax;
+      document.getElementById('totalTax').textContent = result.totalTax;
+      document.getElementById('annualNHIP').textContent = result.annualNHIP;
+      document.getElementById('monthlyNHIP').textContent = result.monthlyNHIP;
+    }
+  </script>
 </body>
 </html>
