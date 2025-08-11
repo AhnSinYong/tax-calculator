@@ -71,14 +71,14 @@
   <div class="container">
     <h2>종합소득세 + 건보료 계산기</h2>
 
-    <label for="workIncome">근로소득 (원)</label>
-    <input type="number" id="workIncome" value="30000000" />
+    <label for="workIncome">근로소득 (만원)</label>
+    <input type="number" id="workIncome" value="3000" min="0" />
 
-    <label for="dividendIncome">배당소득 (원)</label>
-    <input type="number" id="dividendIncome" value="25000000" />
+    <label for="dividendIncome">배당소득 (만원)</label>
+    <input type="number" id="dividendIncome" value="2500" min="0" />
 
-    <label for="propertyValue">재산 (원)</label>
-    <input type="number" id="propertyValue" value="200000000" />
+    <label for="propertyValue">재산 (만원)</label>
+    <input type="number" id="propertyValue" value="20000" min="0" />
 
     <label for="isLocalMember">지역가입자 여부</label>
     <select id="isLocalMember">
@@ -102,6 +102,11 @@
 
   <script>
     function calcTaxAndNHIP({ workIncome = 0, dividendIncome = 0, propertyValue = 0, isLocalMember = false }) {
+      // 입력 단위는 만원 → 원 단위 변환
+      workIncome *= 10000;
+      dividendIncome *= 10000;
+      propertyValue *= 10000;
+
       let workDeduction = 0;
       if (workIncome <= 5000000) workDeduction = workIncome * 0.7;
       else if (workIncome <= 15000000) workDeduction = 3500000 + (workIncome - 5000000) * 0.4;
@@ -144,12 +149,12 @@
       const totalAnnualNHIP = annualNHIP + annualLTC;
 
       return {
-        taxableIncome: taxableIncome.toLocaleString() + ' 원',
-        incomeTax: Math.round(incomeTax).toLocaleString() + ' 원',
-        localTax: Math.round(localTax).toLocaleString() + ' 원',
-        totalTax: Math.round(incomeTax + localTax).toLocaleString() + ' 원',
-        annualNHIP: Math.round(totalAnnualNHIP).toLocaleString() + ' 원',
-        monthlyNHIP: Math.round(totalAnnualNHIP / 12).toLocaleString() + ' 원',
+        taxableIncome: (taxableIncome / 10000).toLocaleString() + ' 만원',
+        incomeTax: Math.round(incomeTax / 10000).toLocaleString() + ' 만원',
+        localTax: Math.round(localTax / 10000).toLocaleString() + ' 만원',
+        totalTax: Math.round((incomeTax + localTax) / 10000).toLocaleString() + ' 만원',
+        annualNHIP: Math.round(totalAnnualNHIP / 10000).toLocaleString() + ' 만원',
+        monthlyNHIP: Math.round(totalAnnualNHIP / 12 / 10000).toLocaleString() + ' 만원',
       };
     }
 
