@@ -1,181 +1,191 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<title>종합소득세 + 건보료 계산기</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    background: #f4f6f8;
-  }
-  .container {
-    max-width: 480px;
-    margin: 30px auto;
-    padding: 20px;
-    background: white;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-  }
-  h2 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  label {
-    display: block;
-    margin-top: 10px;
-    font-weight: bold;
-  }
-  input,
-  select {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-  }
-  button {
-    width: 100%;
-    margin-top: 20px;
-    padding: 12px;
-    background: #4caf50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-  }
-  button:hover {
-    background: #45a049;
-  }
-  table {
-    width: 100%;
-    margin-top: 20px;
-    border-collapse: collapse;
-  }
-  th,
-  td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: right;
-  }
-  th {
-    background: #f0f0f0;
-    text-align: left;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>배당수익률 계산기</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .calculator {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            min-width: 400px;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 300;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            color: white;
+            margin-bottom: 8px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 16px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="number"]::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 25px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .result {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result-text {
+            color: white;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .result-value {
+            color: #4ecdc4;
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        .formula {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            text-align: center;
+            margin-top: 15px;
+            font-style: italic;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h2>종합소득세 + 건보료 계산기</h2>
+    <div class="calculator">
+        <h1>배당수익률 계산기</h1>
+        
+        <div class="input-group">
+            <label for="stockPrice">주가</label>
+            <input type="number" id="stockPrice" placeholder="주가를 입력하세요" step="0.01">
+        </div>
 
-    <label for="workIncome">근로소득 (만원)</label>
-    <input type="number" id="workIncome" value="3000" min="0" />
+        <div class="input-group">
+            <label for="dividend">배당금</label>
+            <input type="number" id="dividend" placeholder="배당금을 입력하세요" step="0.01">
+        </div>
 
-    <label for="dividendIncome">배당소득 (만원)</label>
-    <input type="number" id="dividendIncome" value="2500" min="0" />
+        <button class="calculate-btn" onclick="calculate()">계산하기</button>
 
-    <label for="propertyValue">재산 (만원)</label>
-    <input type="number" id="propertyValue" value="20000" min="0" />
+        <div class="result" id="result">
+            <div class="result-text">계산 결과가 여기에 표시됩니다</div>
+        </div>
 
-    <label for="isLocalMember">지역가입자 여부</label>
-    <select id="isLocalMember">
-      <option value="false">아니오</option>
-      <option value="true">예</option>
-    </select>
+        <div class="formula">
+            공식: (배당금 ÷ 주가) × 5200
+        </div>
+    </div>
 
-    <button onclick="calculate()">계산하기</button>
+    <script>
+        function calculate() {
+            const stockPrice = parseFloat(document.getElementById('stockPrice').value);
+            const dividend = parseFloat(document.getElementById('dividend').value);
+            const resultDiv = document.getElementById('result');
 
-    <table id="resultTable" style="display:none">
-      <tbody>
-        <tr><th>과세표준</th><td id="taxableIncome"></td></tr>
-        <tr><th>종합소득세</th><td id="incomeTax"></td></tr>
-        <tr><th>지방소득세</th><td id="localTax"></td></tr>
-        <tr><th>총 세금</th><td id="totalTax"></td></tr>
-        <tr><th>연간 건강보험료</th><td id="annualNHIP"></td></tr>
-        <tr><th>월 건강보험료</th><td id="monthlyNHIP"></td></tr>
-      </tbody>
-    </table>
-  </div>
+            // 입력값 검증
+            if (isNaN(stockPrice) || isNaN(dividend) || stockPrice <= 0) {
+                resultDiv.innerHTML = '<div class="result-text" style="color: #ff6b6b;">올바른 값을 입력해주세요</div>';
+                return;
+            }
 
-  <script>
-    function calcTaxAndNHIP({ workIncome = 0, dividendIncome = 0, propertyValue = 0, isLocalMember = false }) {
-      // 입력 단위 만원 → 원 변환
-      workIncome *= 10000;
-      dividendIncome *= 10000;
-      propertyValue *= 10000;
+            // 계산 수행
+            const result = (dividend / stockPrice) * 5200;
 
-      let workDeduction = 0;
-      if (workIncome <= 5000000) workDeduction = workIncome * 0.7;
-      else if (workIncome <= 15000000) workDeduction = 3500000 + (workIncome - 5000000) * 0.4;
-      else if (workIncome <= 45000000) workDeduction = 7500000 + (workIncome - 15000000) * 0.15;
-      else if (workIncome <= 100000000) workDeduction = 12000000 + (workIncome - 45000000) * 0.05;
-      else workDeduction = 14750000 + (workIncome - 100000000) * 0.02;
-
-      const taxableIncome = Math.max(0, (workIncome - workDeduction) + dividendIncome);
-
-      const taxTable = [
-        { limit: 14000000, rate: 0.06, minus: 0 },
-        { limit: 50000000, rate: 0.15, minus: 1260000 },
-        { limit: 88000000, rate: 0.24, minus: 5760000 },
-        { limit: 150000000, rate: 0.35, minus: 15440000 },
-        { limit: 300000000, rate: 0.38, minus: 19940000 },
-        { limit: 500000000, rate: 0.40, minus: 25940000 },
-        { limit: 1000000000, rate: 0.42, minus: 35940000 },
-        { limit: Infinity, rate: 0.45, minus: 65940000 },
-      ];
-
-      const bracket = taxTable.find(b => taxableIncome <= b.limit);
-      const incomeTax = taxableIncome * bracket.rate - bracket.minus;
-
-      const localTax = incomeTax * 0.1;
-
-      const nhipRate = 0.0709;
-      const ltcRate = 0.09182;
-
-      let annualNHIP = 0;
-      if (!isLocalMember) {
-        if (dividendIncome > 20000000) {
-          annualNHIP = (dividendIncome - 20000000) * nhipRate;
+            // 결과 표시
+            resultDiv.innerHTML = `
+                <div>
+                    <div class="result-text">계산 결과</div>
+                    <div class="result-value">${result.toLocaleString('ko-KR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                </div>
+            `;
         }
-      } else {
-        const propertyScore = propertyValue / 10000000 * 50;
-        const propertyMonthly = propertyScore * 205;
-        const propertyAnnual = propertyMonthly * 12;
-        annualNHIP = taxableIncome * nhipRate + propertyAnnual;
-      }
 
-      const annualLTC = annualNHIP * ltcRate;
-      const totalAnnualNHIP = annualNHIP + annualLTC;
+        // Enter 키로 계산하기
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                calculate();
+            }
+        });
 
-      return {
-        taxableIncome: taxableIncome.toLocaleString() + ' 원',
-        incomeTax: Math.round(incomeTax).toLocaleString() + ' 원',
-        localTax: Math.round(localTax).toLocaleString() + ' 원',
-        totalTax: Math.round(incomeTax + localTax).toLocaleString() + ' 원',
-        annualNHIP: Math.round(totalAnnualNHIP).toLocaleString() + ' 원',
-        monthlyNHIP: Math.round(totalAnnualNHIP / 12).toLocaleString() + ' 원',
-      };
-    }
-
-    function calculate() {
-      const workIncome = parseInt(document.getElementById('workIncome').value, 10);
-      const dividendIncome = parseInt(document.getElementById('dividendIncome').value, 10);
-      const propertyValue = parseInt(document.getElementById('propertyValue').value, 10);
-      const isLocalMember = document.getElementById('isLocalMember').value === 'true';
-
-      const result = calcTaxAndNHIP({ workIncome, dividendIncome, propertyValue, isLocalMember });
-
-      document.getElementById('resultTable').style.display = 'table';
-      document.getElementById('taxableIncome').textContent = result.taxableIncome;
-      document.getElementById('incomeTax').textContent = result.incomeTax;
-      document.getElementById('localTax').textContent = result.localTax;
-      document.getElementById('totalTax').textContent = result.totalTax;
-      document.getElementById('annualNHIP').textContent = result.annualNHIP;
-      document.getElementById('monthlyNHIP').textContent = result.monthlyNHIP;
-    }
-  </script>
+        // 실시간 계산 (선택사항)
+        document.getElementById('stockPrice').addEventListener('input', calculate);
+        document.getElementById('dividend').addEventListener('input', calculate);
+    </script>
 </body>
 </html>
