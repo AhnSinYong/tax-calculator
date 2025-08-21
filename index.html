@@ -18,6 +18,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
+        }
+
+        .calculator-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .calculator {
@@ -27,14 +35,14 @@
             padding: 40px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            min-width: 400px;
+            min-width: 350px;
         }
 
         h1 {
             color: white;
             text-align: center;
             margin-bottom: 30px;
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 300;
         }
 
@@ -73,25 +81,6 @@
             color: rgba(255, 255, 255, 0.7);
         }
 
-        .calculate-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 25px;
-        }
-
-        .calculate-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(255, 107, 107, 0.4);
-        }
-
         .result {
             background: rgba(255, 255, 255, 0.15);
             border-radius: 15px;
@@ -125,38 +114,73 @@
             margin-top: 15px;
             font-style: italic;
         }
+
+        @media (max-width: 768px) {
+            .calculator-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .calculator {
+                min-width: 300px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="calculator">
-        <h1>배수율 계산기</h1>
-        
-        <div class="input-group">
-            <label for="stockPrice">주가</label>
-            <input type="number" id="stockPrice" placeholder="주가를 입력하세요" step="0.01">
+    <div class="calculator-container">
+        <!-- 5200 계산기 -->
+        <div class="calculator">
+            <h1>배수율 계산기 (×5200)</h1>
+            
+            <div class="input-group">
+                <label for="stockPrice1">주가</label>
+                <input type="number" id="stockPrice1" placeholder="주가를 입력하세요" step="0.01">
+            </div>
+
+            <div class="input-group">
+                <label for="dividend1">배당금</label>
+                <input type="number" id="dividend1" placeholder="배당금을 입력하세요" step="0.01">
+            </div>
+
+            <div class="result" id="result1">
+                <div class="result-text">계산 결과가 여기에 표시됩니다</div>
+            </div>
+
+            <div class="formula">
+                공식: (배당금 ÷ 주가) × 5200
+            </div>
         </div>
 
-        <div class="input-group">
-            <label for="dividend">배당금</label>
-            <input type="number" id="dividend" placeholder="배당금을 입력하세요" step="0.01">
-        </div>
+        <!-- 1200 계산기 -->
+        <div class="calculator">
+            <h1>배수율 계산기 (×1200)</h1>
+            
+            <div class="input-group">
+                <label for="stockPrice2">주가</label>
+                <input type="number" id="stockPrice2" placeholder="주가를 입력하세요" step="0.01">
+            </div>
 
-<!--         <button class="calculate-btn" onclick="calculate()">계산하기</button> -->
+            <div class="input-group">
+                <label for="dividend2">배당금</label>
+                <input type="number" id="dividend2" placeholder="배당금을 입력하세요" step="0.01">
+            </div>
 
-        <div class="result" id="result">
-            <div class="result-text">계산 결과가 여기에 표시됩니다</div>
-        </div>
+            <div class="result" id="result2">
+                <div class="result-text">계산 결과가 여기에 표시됩니다</div>
+            </div>
 
-        <div class="formula">
-            공식: (배당금 ÷ 주가) × 5200
+            <div class="formula">
+                공식: (배당금 ÷ 주가) × 1200
+            </div>
         </div>
     </div>
 
     <script>
-        function calculate() {
-            const stockPrice = parseFloat(document.getElementById('stockPrice').value);
-            const dividend = parseFloat(document.getElementById('dividend').value);
-            const resultDiv = document.getElementById('result');
+        function calculate1() {
+            const stockPrice = parseFloat(document.getElementById('stockPrice1').value);
+            const dividend = parseFloat(document.getElementById('dividend1').value);
+            const resultDiv = document.getElementById('result1');
 
             // 입력값 검증
             if (isNaN(stockPrice) || isNaN(dividend) || stockPrice <= 0) {
@@ -164,7 +188,7 @@
                 return;
             }
 
-            // 계산 수행
+            // 계산 수행 (×5200)
             const result = (dividend / stockPrice) * 5200;
 
             // 결과 표시
@@ -176,16 +200,35 @@
             `;
         }
 
-        // Enter 키로 계산하기
-        document.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                calculate();
-            }
-        });
+        function calculate2() {
+            const stockPrice = parseFloat(document.getElementById('stockPrice2').value);
+            const dividend = parseFloat(document.getElementById('dividend2').value);
+            const resultDiv = document.getElementById('result2');
 
-        // 실시간 계산 (선택사항)
-        document.getElementById('stockPrice').addEventListener('input', calculate);
-        document.getElementById('dividend').addEventListener('input', calculate);
+            // 입력값 검증
+            if (isNaN(stockPrice) || isNaN(dividend) || stockPrice <= 0) {
+                resultDiv.innerHTML = '<div class="result-text" style="color: #ff6b6b;">올바른 값을 입력해주세요</div>';
+                return;
+            }
+
+            // 계산 수행 (×1200)
+            const result = (dividend / stockPrice) * 1200;
+
+            // 결과 표시
+            resultDiv.innerHTML = `
+                <div>
+                    <div class="result-text">계산 결과</div>
+                    <div class="result-value">${result.toLocaleString('ko-KR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                </div>
+            `;
+        }
+
+        // 실시간 계산
+        document.getElementById('stockPrice1').addEventListener('input', calculate1);
+        document.getElementById('dividend1').addEventListener('input', calculate1);
+        
+        document.getElementById('stockPrice2').addEventListener('input', calculate2);
+        document.getElementById('dividend2').addEventListener('input', calculate2);
     </script>
 </body>
 </html>
